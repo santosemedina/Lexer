@@ -36,8 +36,8 @@ public class Lexer {
 	}
 	
 	//EsParentesis (   ) Verifica si el character es un parentesis.
-	public static boolean EsParentesis(char caracter) {
-		if((caracter=='(') || (caracter==')'))
+	public static boolean EsParentesis(char[] caracteres, int indice) {
+		if((caracteres[indice]=='(') || (caracteres[indice]==')'))
 		{
 			return true;
 		}
@@ -45,13 +45,13 @@ public class Lexer {
 	}
 	
 	//Parentesis Devuelve el token del tipo de parentesis
-	public static String Parentesis(char caracter) {
-		if(EsParentesis(caracter)) {
-			if(caracter=='(') {
-				return "TKN_parentesisIzq";
+	public static String Parentesis(char[] caracteres, int indice) {
+		if(EsParentesis(caracteres, indice)) {
+			if(caracteres[indice]=='(') {
+				return "TKN_parentesisIzq, )";
 			}
-			else if(caracter==')') {
-				return "TKN_parentesisDer";
+			else if(caracteres[indice]==')') {
+				return "TKN_parentesisDer , )";
 			}
 		}
 		return "Error";
@@ -59,13 +59,13 @@ public class Lexer {
 	
 	
 	//EsOperadorBinario verifica si el caracter es operador binario ej. +
-	public static boolean EsOperadorBinario(char[] caracter, int indice) {
-		if(caracter[indice]=='+' || caracter[indice]=='-'|| caracter[indice]=='*'|| caracter[indice]=='/'|| caracter[indice]=='<'|| caracter[indice]=='>') {
+	public static boolean EsOperadorBinario(char[] caracteres, int indice) {
+		if(caracteres[indice]=='+' || caracteres[indice]=='-'|| caracteres[indice]=='*'|| caracteres[indice]=='/'|| caracteres[indice]=='<'|| caracteres[indice]=='>') {
 			return true;
 		}
 		
 		//Maneja la excepcion si es un = seguido por =,<,>
-		else if(EsOperadorCompuesto(caracter,indice)) {
+		else if(EsOperadorCompuesto(caracteres,indice)) {
 			return true;
 		}
 		return false;
