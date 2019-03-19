@@ -17,6 +17,24 @@ public class Lexer {
 		tablaDeSimbolos.put("Escribe","TKN_palabraReservada");	
 	}
 	
+	//EsPalabraReservada verifica que sea una palabra reservada que esta en la tabla
+	public static boolean EsPalabraReservada(String palabra) {
+		if(tablaDeSimbolos.containsKey(palabra)) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	//PalabraReservada devuelve el token y la palabra
+	public static String PalabraReservada(String palabra) {
+		if(EsPalabraReservada(palabra)) {
+			return tablaDeSimbolos.get(palabra)+", "+palabra;
+		}
+		return "Error";
+	}
+	
 	//EsParentesis (   ) Verifica si el character es un parentesis.
 	public static boolean EsParentesis(char caracter) {
 		if((caracter=='(') || (caracter==')'))
@@ -124,6 +142,8 @@ public class Lexer {
 			if(EsOperadorBinario(array,i)){
 				System.out.println(OperadorBinario(array,i));
 				if(EsOperadorCompuesto(array,i)) {
+					//Es importante que si es un operador compuesto se debe sumar 1 al apuntador 
+					//ya que va a leer ambos como un solo operador binario.
 					i++;
 				}
 			}
