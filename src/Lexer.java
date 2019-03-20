@@ -1,4 +1,9 @@
 import java.util.Hashtable;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Arrays;
 
 public class Lexer {
 
@@ -14,7 +19,7 @@ public class Lexer {
 		tablaDeSimbolos.put("finSi","TKN_palabraReservada");
 		tablaDeSimbolos.put("Mientras","TKN_palabraReservada");
 		tablaDeSimbolos.put("finmientras","TKN_palabraReservada");
-		tablaDeSimbolos.put("Escribe","TKN_palabraReservada");	
+		tablaDeSimbolos.put("Escribe","TKN_palabraReservada");
 	}
 
 	//EsPalabraReservada verifica que sea una palabra reservada que esta en la tabla
@@ -78,7 +83,7 @@ public class Lexer {
 	}
 
 	/*
-	 * OperadorBinario revisa primero si es un operador compuesto y lo identifica 
+	 * OperadorBinario revisa primero si es un operador compuesto y lo identifica
 	 *                 sino busca si es un operador binario simple y lo identifica.
 	 */
 	public static String OperadorBinario(char[] caracteres, int indice) {
@@ -160,22 +165,34 @@ public class Lexer {
 	public static void main(String[] args)
 	{
 		TablaDeSimbolos();
-
-		String test = "+";
-		char[] array = test.toCharArray();
 		
+		List<String> result = null;
+
+		try {
+
+			result = Files.readAllLines(Paths.get("/Users/Carlos/Desktop/Lexer/src/programa.txt"));
+		} catch(IOException e) {
+			
+			System.out.println("No file found.\n");
+			System.exit(0);
+		}
+
+		System.out.println(Arrays.toString(result.toArray()));
+		
+		//char[] array = test.toCharArray();
+
 		//Para leer archivo usar despues
 		//Lisist<String> list = Files.readAllLines(Paths.get("path/of/text"), StandardCharsets.UTF_8);
 
-		for(int i=0;i<array.length;i++) {
-			if(EsOperadorBinario(array,i)){
-				System.out.println(OperadorBinario(array,i));
-				if(EsOperadorCompuesto(array,i)) {
-					//Es importante que si es un operador compuesto se debe sumar 1 al apuntador 
-					//ya que va a leer ambos como un solo operador binario.
-					i++;
-				}
-			}
-		}
+		// for(int i=0;i<array.length;i++) {
+		// 	if(EsOperadorBinario(array,i)){
+		// 		System.out.println(OperadorBinario(array,i));
+		// 		if(EsOperadorCompuesto(array,i)) {
+		// 			//Es importante que si es un operador compuesto se debe sumar 1 al apuntador
+		// 			//ya que va a leer ambos como un solo operador binario.
+		// 			i++;
+		// 		}
+		// 	}
+		// }
 	}
 }
