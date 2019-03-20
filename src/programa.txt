@@ -1,0 +1,5 @@
+Inicio
+Si(var1)
+Escribe(Hola);
+finsi
+final
