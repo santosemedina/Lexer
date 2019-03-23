@@ -170,7 +170,7 @@ public class Lexer {
 
 		try {
 
-			result = Files.readAllLines(Paths.get("/Users/Carlos/Desktop/Lexer/src/programa.txt"));
+			result = Files.readAllLines(Paths.get("/Users/robertomarnegron/Documents/GitHub/Lexer/src/programa.txt"));
 		} catch(IOException e) {
 			
 			System.out.println("No file found.\n");
