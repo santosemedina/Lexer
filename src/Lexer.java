@@ -17,7 +17,7 @@ public class Lexer {
 	
 	//Llenar la tabla de simbolos
 	public static void TablaDeSimbolos() {
-		tablaDeSimbolos.put("Inicio","PALARES");
+		tablaDeSimbolos.put("inicio","PALARES");
 		tablaDeSimbolos.put("final","PALARES");
 		tablaDeSimbolos.put("Si","PALARES");
 		tablaDeSimbolos.put("sino","PALARES");
