@@ -1,198 +1,341 @@
-import java.util.Hashtable;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
-import java.util.Arrays;
+import java.util.Objects;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.Hashtable;
 
 public class Lexer {
-
+	
 	//HashTable para guardar (Lexema, Token) de las palabras reservadas
 	public static Hashtable<String, String> tablaDeSimbolos = new Hashtable<String, String>();
-
+	
 	//Llenar la tabla de simbolos
 	public static void TablaDeSimbolos() {
-		tablaDeSimbolos.put("Inicio","TKN_palabraReservada");
-		tablaDeSimbolos.put("final","TKN_palabraReservada");
-		tablaDeSimbolos.put("Si","TKN_palabraReservada");
-		tablaDeSimbolos.put("sino","TKN_palabraReservada");
-		tablaDeSimbolos.put("finSi","TKN_palabraReservada");
-		tablaDeSimbolos.put("Mientras","TKN_palabraReservada");
-		tablaDeSimbolos.put("finmientras","TKN_palabraReservada");
-		tablaDeSimbolos.put("Escribe","TKN_palabraReservada");
+		tablaDeSimbolos.put("Inicio","PALARES");
+		tablaDeSimbolos.put("final","PALARES");
+		tablaDeSimbolos.put("Si","PALARES");
+		tablaDeSimbolos.put("sino","PALARES");
+		tablaDeSimbolos.put("finsi","PALARES");
+		tablaDeSimbolos.put("Mientras","PALARES");
+		tablaDeSimbolos.put("finmientras","PALARES");
+		tablaDeSimbolos.put("Escribe","PALARES");
 	}
+	
+	//Tipos de Token que puede hacer en el lenguaje establecido
+    public static enum Type {
+        PARENIZ, PARENDE, ID, PALARES, DELIM, MAS, MENOS, DIV, MULT, IGUAL, ASIG, MENOR, MAYOR, MENORIG, MAYORIG, NUM, ERROR;
+    }
+    
+    //Clase Token que contiene el tipo de token mas el lexema correspondiente
+    public static class Token {
+        public final Type token;
+        public final String content; 
+        
+        public Token(Type t, String c) {
+            this.token = t;
+            this.content = c;
+        }
+        
+        //toString de cada Token, el lexema en la clase es para usarlo realmente cuando es una palabra reservada, identificador o numero
+        public String toString() {
+            if(token == Type.ID) {
+                return "ID, " + content + "\n";
+            }
+            
+            if(token == Type.PALARES) {
+                return "PALARES, " + content + "\n";
+            }
+            
+            if(token == Type.NUM) {
+                return "NUM, " + content + "\n";
+            }
+            
+            if(token == Type.PARENIZ) {
+                return "PARENIZ, (\n";
+            }
+            
+            if(token == Type.PARENDE) {
+                return "PARENDE, )\n";
+            }
+            
+            if(token == Type.DELIM) {
+                return "DELIM, ;\n";
+            }
+            
+            if(token == Type.MAS) {
+                return "MAS, +\n";
+            }
+            
+            if(token == Type.MENOS) {
+                return "MENOS, -\n";
+            }
+            
+            if(token == Type.DIV) {
+                return "DIV, /\n";
+            }
+            
+            if(token == Type.MULT) {
+                return "MULT, *\n";
+            }
+            
+            if(token == Type.IGUAL) {
+                return "IGUAL, ==\n";
+            }
+            
+            if(token == Type.ASIG) {
+                return "ASIG, =\n";
+            }
+            
+            if(token == Type.MENOR) {
+                return "MENOR, <\n";
+            }
+            
+            if(token == Type.MAYOR) {
+                return "MAYOR, >\n";
+            }
+            
+            if(token == Type.MENORIG) {
+                return "MENORIG, <=\n";
+            }
+            
+            if(token == Type.MAYORIG) {
+                return "MAYORIG, >=\n";
+            }
+            
+            if(token == Type.ERROR) {
+            	return "ERROR LEXICO\n";
+            }
+            
+            else {
+            	return "ERROR LEXICO\n";
+            }
+            
+        }
+    }
 
-	//EsPalabraReservada verifica que sea una palabra reservada que esta en la tabla
-	public static boolean EsPalabraReservada(String palabra) {
-		if(tablaDeSimbolos.containsKey(palabra)) {
-			return true;
-		}
-		return false;
-	}
+    //Funcion que coge todas las letras o numeros para formar lo que seria un identificador
+    public static String getID(String s, int i) {
+        int j = i;
+        for( ; j < s.length(); ) {
+            if(Character.isLetter(s.charAt(j)) || Character.isDigit(s.charAt(j))) {
+                j++;
+            } else {
+                return s.substring(i, j);
+            }
+        }
+        return s.substring(i, j);
+    }
+    
+    //Funcion que coge todos los numeros que aparescan corridos en el source code para identificarlos como un numero
+    public static String getNumber(String s, int i) {
+        int j = i;
+        for( ; j < s.length(); ) {
+            if(Character.isDigit(s.charAt(j))) {
+                j++;
+            } else {
+                return s.substring(i, j);
+            }
+        }
+        return s.substring(i, j);
+    }
 
-	//PalabraReservada devuelve el token y la palabra
-	public static String PalabraReservada(String palabra) {
-		if(EsPalabraReservada(palabra)) {
-			return tablaDeSimbolos.get(palabra)+", "+palabra;
-		}
-		return "Error";
-	}
-
-	//EsParentesis (   ) Verifica si el character es un parentesis.
-	public static boolean EsParentesis(char[] caracteres, int indice) {
-		if((caracteres[indice]=='(') || (caracteres[indice]==')'))
-		{
-			return true;
-		}
-		return false;
-	}
-
-	//Parentesis Devuelve el token del tipo de parentesis
-	public static String Parentesis(char[] caracteres, int indice) {
-		if(EsParentesis(caracteres, indice)) {
-			if(caracteres[indice]=='(') {
-				return "TKN_parentesisIzq, )";
+    //Funcion que analiza linea por linea el source code para establecer los token correspondientes (basicamente todo el analizador lexico)
+    public static void lex(String input) {
+    	
+    	//Una lista para guardar todos los token por linea de texto que salga del source code
+        List<Token> result = new ArrayList<Token>();
+        
+        //For loop que coge letra-a-letra y busca si hay algun operador binario u otra letra que se pueda identificar sola con un token
+        //Si encuentre una letra va al loop de buscar identificador, si encuentra un digito va al de numero, si es un whitespace se lo salta, otra cosa es error
+        for(int i = 0; i < input.length(); ) {
+        	
+            switch(input.charAt(i)) {
+            
+            case '(':
+                result.add(new Token(Type.PARENIZ, "("));
+                i++;
+                break;
+            case ')':
+                result.add(new Token(Type.PARENDE, ")"));
+                i++;
+                break;
+            case ';':
+                result.add(new Token(Type.DELIM, ";"));
+                i++;
+                break;
+            case '+':
+                result.add(new Token(Type.MAS, "+"));
+                i++;
+                break;
+            case '-':
+                result.add(new Token(Type.MENOS, "-"));
+                i++;
+                break;
+            case '/':
+                result.add(new Token(Type.DIV, "/"));
+                i++;
+                break;
+            case '*':
+                result.add(new Token(Type.MULT, "*"));
+                i++;
+                break;
+            case '=':
+            	if(input.charAt(i + 1) == '=') {
+            		result.add(new Token(Type.IGUAL, "=="));
+            		i = i + 2;
+            	}
+            	
+            	else {
+            		result.add(new Token(Type.ASIG, "="));
+            		i++;
+            	}
+                break;
+            case '<':
+            	if(input.charAt(i + 1) == '=') {
+            		result.add(new Token(Type.MENORIG, "<="));
+            		i = i + 2;
+            	}
+            	
+            	else {
+            		result.add(new Token(Type.MENOR, "<"));
+            		i++;
+            	}
+                break;
+            case '>':
+            	if(input.charAt(i + 1) == '=') {
+            		result.add(new Token(Type.MAYORIG, ">="));
+            		i = i + 2;
+            	}
+            	
+            	else {
+            		result.add(new Token(Type.MAYOR, ">"));
+            		i++;
+            	}
+                break;
+                
+            default:
+                if(Character.isWhitespace(input.charAt(i))) {
+                    i++;
+                } 
+                
+                else if(Character.isLetter(input.charAt(i))){
+                    String nameID = getID(input, i);
+                    i += nameID.length();
+                    
+                    if(tablaDeSimbolos.containsKey(nameID)) {
+                    	if(Objects.equals("PALARES", tablaDeSimbolos.get(nameID))) {
+                    		result.add(new Token(Type.PALARES, nameID));
+                    	}
+                    	else {
+                    		if(!nameID.equals(nameID.toLowerCase()) || nameID.length() < 2) {
+                    			result.add(new Token(Type.ERROR, nameID));
+                    		}
+                    		
+                    		else {
+                    			result.add(new Token(Type.ID, nameID));
+                    		}
+                    		
+                    	}
+                    }
+                    
+                    else {
+                    	if(!nameID.equals(nameID.toLowerCase()) || nameID.length() < 2) {
+                			result.add(new Token(Type.ERROR, nameID));
+                		}
+                    	
+                    	else {
+                    		tablaDeSimbolos.put(nameID, "ID");
+                        	result.add(new Token(Type.ID, nameID));
+                    	}
+                    }
+                }
+                
+                else if(Character.isDigit(input.charAt(i))) {
+                	String numberID = getNumber(input, i);
+                    i += numberID.length();
+                    
+                    if(numberID.length() < 2) {
+            			result.add(new Token(Type.ERROR, numberID));
+            		}
+            		
+            		else {
+            			result.add(new Token(Type.NUM, numberID));
+            		}
+                }
+                
+                else {
+                	
+                	result.add(new Token(Type.ERROR, Character.toString(input.charAt(i))));
+                	i++;
+                }
+                break;
+            }
+        }
+        
+        //Escribe cada token y lexema en un txt para poder visualisar o usar mas tarde
+        Path path = Paths.get("/Users/robertomarnegron/Documents/GitHub/Lexer/src/programa.txt");
+        
+        for(Token t: result) {
+        	
+        	try {
+				Files.write(path, t.toString().getBytes(), StandardOpenOption.APPEND);
+			} catch (IOException e) {
+				System.out.println("No file found to write output.\n");
+				System.exit(0);
 			}
-			else if(caracteres[indice]==')') {
-				return "TKN_parentesisDer , )";
-			}
-		}
-		return "Error";
-	}
+        }
+        
+    }
 
+    public static void main(String[] args) {
+    	
+    	List<String> result = null;
+    	int index = 1;
+    	
+    	TablaDeSimbolos();
 
-	//EsOperadorBinario verifica si el caracter es operador binario ej. +
-	public static boolean EsOperadorBinario(char[] caracteres, int indice) {
-		if(caracteres[indice]=='+' || caracteres[indice]=='-'|| caracteres[indice]=='*'|| caracteres[indice]=='/'|| caracteres[indice]=='<'|| caracteres[indice]=='>') {
-			return true;
-		}
-
-		//Maneja la excepcion si es un = seguido por =,<,>
-		else if(EsOperadorCompuesto(caracteres,indice)) {
-			return true;
-		}
-		return false;
-	}
-
-	//EsOperadorCompuesto Revisa Si es un operador de mas de un caracter para asi procesarlo como uno
-	public static boolean EsOperadorCompuesto(char[] caracteres, int indice) {
-		if((caracteres[indice]=='<') ||(caracteres[indice]=='>') || (caracteres[indice]=='=') && (caracteres[indice+1] == '=')){
-			return true;
-		}
-		return false;
-	}
-
-	/*
-	 * OperadorBinario revisa primero si es un operador compuesto y lo identifica
-	 *                 sino busca si es un operador binario simple y lo identifica.
-	 */
-	public static String OperadorBinario(char[] caracteres, int indice) {
-
-		if(EsOperadorCompuesto(caracteres, indice)) {
-
-			String operadorCompuesto=String.valueOf(caracteres[indice]) + String.valueOf(caracteres[indice+1]);
-
-			switch(operadorCompuesto) {
-
-			case "<=":
-				return "TKN_opBinario , MEI";
-
-			case ">=":
-				return "TKN_opBinario , MAI";
-
-			case "==":
-				return "TKN_opBinario , IGU";
-
-			default:
-				return "Error";
-			}
-		}
-		else {
-			switch(caracteres[indice]) {
-
-			case '+':
-				return "TKN_opBinario , SUM";
-
-			case '-':
-				return "TKN_opBinario , RES";
-
-			case '*':
-				return "TKN_opBinario , MUL";
-
-			case '/':
-				return "TKN_opBinario , DIV";
-
-			case '>':
-				return "TKN_opBinario , MAY";
-
-			case '<':
-				return "TKN_opBinario , MEN";
-
-			default:
-				return "Error";
-			}
-		}
-	}
-
-	//EsDigito Revisa si el caracter es digito o no. 1,2,3,4,5,6,7,8,9,0
-	public static boolean EsDigito(char[] caracteres, int indice) {
-		if(Character.isDigit(caracteres[indice])) {
-			return true;
-		}
-		return false;
-	}
-
-	//EsLetra Verifica si el caracter es una letra
-	public static boolean EsLetra(char[] caracteres, int indice) {
-		if(Character.isLetter(caracteres[indice])) {
-			return true;
-		}
-		return false;
-	}
-
-
-	//Automata
-	public static void Automata(char[] caracteres, int indice) {
-
-		//llenar tabla de simbolos
-		TablaDeSimbolos();
-
-		//LeerArchivo();
-
-	}
-
-	//Funcion Main
-	public static void main(String[] args)
-	{
-		TablaDeSimbolos();
-		
-		List<String> result = null;
-
+    	//Abre el archivo (source code)
 		try {
 
 			result = Files.readAllLines(Paths.get("/Users/robertomarnegron/Documents/GitHub/Lexer/src/programa.txt"));
+			
 		} catch(IOException e) {
 			
 			System.out.println("No file found.\n");
 			System.exit(0);
 		}
-
-		System.out.println(Arrays.toString(result.toArray()));
 		
-		//char[] array = test.toCharArray();
-
-		//Para leer archivo usar despues
-		//Lisist<String> list = Files.readAllLines(Paths.get("path/of/text"), StandardCharsets.UTF_8);
-
-		// for(int i=0;i<array.length;i++) {
-		// 	if(EsOperadorBinario(array,i)){
-		// 		System.out.println(OperadorBinario(array,i));
-		// 		if(EsOperadorCompuesto(array,i)) {
-		// 			//Es importante que si es un operador compuesto se debe sumar 1 al apuntador
-		// 			//ya que va a leer ambos como un solo operador binario.
-		// 			i++;
-		// 		}
-		// 	}
-		// }
-	}
+		//Abre y borra el archivo de salida para luego escribir el resultado
+		try {
+			
+			new PrintWriter("/Users/robertomarnegron/Documents/GitHub/Lexer/src/programa.txt").close();
+			
+		} catch (FileNotFoundException e) {
+			
+			System.out.println("No file found to write output.\n");
+			System.exit(0);
+		}
+		
+		//Envia linea por linea al analisador lexico 
+		for(String line: result) {
+			String lineOfCodeTXT = "#" + index + " " + line + "\n";
+			
+			//Escribe el numero de linea y la linea del source code sin aun identificar tokens
+			try {
+				Files.write(Paths.get("/Users/robertomarnegron/Documents/GitHub/Lexer/src/programa.txt"), lineOfCodeTXT.getBytes(), StandardOpenOption.APPEND);
+			} catch (IOException e) {
+				System.out.println("No file found to write output.\n");
+				System.exit(0);
+			}
+			lex(line);
+			index++;
+		}
+		
+    }
 }
