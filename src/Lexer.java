@@ -10,7 +10,11 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
+
 public class Lexer {
+	
+	 public static String path = "/Users/robertomarnegron/Documents/GitHub/Lexer/src/programa.txt" ;
+	
 	
 	//HashTable para guardar (Lexema, Token) de las palabras reservadas
 	public static Hashtable<String, String> tablaDeSimbolos = new Hashtable<String, String>();
@@ -279,7 +283,7 @@ public class Lexer {
         }
         
         //Escribe cada token y lexema en un txt para poder visualisar o usar mas tarde
-        Path path = Paths.get("/Users/robertomarnegron/Documents/GitHub/Lexer/src/programa.txt");
+        Path path = Paths.get(Lexer.path);
         
         for(Token t: result) {
         	
@@ -303,7 +307,7 @@ public class Lexer {
     	//Abre el archivo (source code)
 		try {
 
-			result = Files.readAllLines(Paths.get("/Users/robertomarnegron/Documents/GitHub/Lexer/src/programa.txt"));
+			result = Files.readAllLines(Paths.get(Lexer.path));
 			
 		} catch(IOException e) {
 			
@@ -314,7 +318,7 @@ public class Lexer {
 		//Abre y borra el archivo de salida para luego escribir el resultado
 		try {
 			
-			new PrintWriter("/Users/robertomarnegron/Documents/GitHub/Lexer/src/programa.txt").close();
+			new PrintWriter(Lexer.path).close();
 			
 		} catch (FileNotFoundException e) {
 			
@@ -328,7 +332,7 @@ public class Lexer {
 			
 			//Escribe el numero de linea y la linea del source code sin aun identificar tokens
 			try {
-				Files.write(Paths.get("/Users/robertomarnegron/Documents/GitHub/Lexer/src/programa.txt"), lineOfCodeTXT.getBytes(), StandardOpenOption.APPEND);
+				Files.write(Paths.get(Lexer.path), lineOfCodeTXT.getBytes(), StandardOpenOption.APPEND);
 			} catch (IOException e) {
 				System.out.println("No file found to write output.\n");
 				System.exit(0);
