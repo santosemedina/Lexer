@@ -1,5 +1,11 @@
-Inicio
+inicio
 Si(var1)
 Escribe(Hola);
+/* Esto es un comentario */
 finsi
+/* comm 7
+   line 2
+   linea 3
+   linea 4
+*/
 final

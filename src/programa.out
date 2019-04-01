@@ -1,0 +1,19 @@
+#1 inicio
+PALARES, inicio
+#2 Si(var1)
+PALARES, Si
+PARENIZ, (
+ID, var1
+PARENDE, )
+#3 Escribe(Hola);
+PALARES, Escribe
+PARENIZ, (
+ERROR LEXICO
+PARENDE, )
+DELIM, ;
+#4 
+#5 finsi
+PALARES, finsi
+#6 
+#7 final
+PALARES, final

@@ -13,8 +13,14 @@ import java.util.Hashtable;
 
 public class Lexer {
 	
-	 public static String path = "/Users/robertomarnegron/Documents/GitHub/Lexer/src/programa.txt" ;
+	//Path para analisis lexico
+	 public static final String path = "/Users/santosmedina/git/Lexer/src/programa.out" ;
 	
+	 //Path y nombre para el cleanFile 
+	 //filePath = Path donde esta el file
+	 //defaultFile = nombre del file
+	 public static final String filePath = "/Users/santosmedina/git/Lexer/src/";
+	 public static final String defaultFile = "programa";
 	
 	//HashTable para guardar (Lexema, Token) de las palabras reservadas
 	public static Hashtable<String, String> tablaDeSimbolos = new Hashtable<String, String>();
@@ -299,6 +305,9 @@ public class Lexer {
 
     public static void main(String[] args) {
     	
+    	//Limpiar commentarios del file
+    	cleanComments.cleanFile(defaultFile+".txt",defaultFile+".out");
+    	 
     	List<String> result = null;
     	int index = 1;
     	
