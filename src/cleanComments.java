@@ -1,4 +1,3 @@
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -10,15 +9,14 @@ public class cleanComments {
 	// Constantes de inicio de comentario y final de comentario
 	public static final String begingCommentFlag = "/*";
 	public static final String endCommentFlag = "*/";
-	public static final String onLineCommentFlag = "//";
 	public static final String endOfLine = "\r\n";
 	
 	//---------------------------------------------------------------------------------
 	//
 	// CAMBIAR LOS PARAMETROS DEL PATH Y EL NOMBRE DEL ARCHIVO POR DEFAULT
 	//
-		public static final String filePath = "/Users/santosmedina/git/Lexer/src/";
-		public static final String defaultFile = "programa";
+	 public static final String filePath = "/Users/santosmedina/git/Lexer/src/";
+	 public static final String defaultFile = "programa";
 	//
 	//---------------------------------------------------------------------------------
 	
@@ -41,19 +39,8 @@ public class cleanComments {
 				line = scanner.next();
 				
 				// Trato la linea para eliminar los comentarios
-				do{		
-					if ( (line.indexOf(onLineCommentFlag) != -1 ) &&
-						 (line.indexOf(endCommentFlag+begingCommentFlag) == -1) ){
-						// Linea tiene comentarios de tipo "En La Linea"
-						
-						// elimino el sub string desde el inicio de comentario hasta el final de la linea
-						stringBeforeComment = line.substring(0, line.indexOf(onLineCommentFlag) );	// substring antes del comentario
-						stringAfterComment  = "";													// substring despues del comentario
-						line = stringBeforeComment + stringAfterComment;						
-						readNextLine = false; // continuo procesando la linea, puede haber comentarios de tipo bloque
-
-					}
-					else if (initComment == 0) {
+				do{					
+					if (initComment == 0) {
 						// La linea de comentario empezo en una linea anterior
 						
 						if( line.indexOf(endCommentFlag) != -1 ) { 
@@ -140,22 +127,24 @@ public class cleanComments {
 	public cleanComments() {
 		// TODO Auto-generated constructor stub
 	}
-	//Test de Clean File
-//	public static void main(String[] args) {
-//		// TODO Auto-generated method stub
-//		
-//		//int i = args.length;
-//		
-//		if(args.length == 0) {
-//			cleanFile(defaultFile+".txt",defaultFile+".out");
-//		}
-//		else if(args.length > 0) {
-//			cleanFile(args[0]+".txt",args[0]+".out");
-//		}
-//		else if(args.length > 1) {
-//			cleanFile(args[0], args[1]);
-//		}
-//
-//	}
+	
+/*Prueba de cleanComments
+ * 	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		
+		int i = args.length;
+		
+		if(args.length == 0) {
+			cleanFile(defaultFile,defaultFile+".out");
+		}
+		else if(args.length > 0) {
+			cleanFile(args[0],args[0]+".out");
+		}
+		else if(args.length > 1) {
+			cleanFile(args[0], args[1]);
+		}
+
+	}
+	*/
 
 }
